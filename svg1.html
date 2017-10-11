@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Draw</title>
+    <style type="text/css">
+        #viewport {
+            display: inline-block;
+            width: 900px;
+            height: 500px;
+            margin: 0;
+            padding: 0;
+            box-sizing:border-box;
+            -moz-box-sizing:border-box;
+            -webkit-box-sizing:border-box;
+        }
+        #view {
+            pointer-events: all;
+            background: #00bbdd;
+            width: 900px;
+            height: 500px;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="coords"></div>
+
+<div id="viewport">
+<svg id="view" height="500" width="900" onmousemove="getCoords(event)" onclick="click(event)">
+    <polyline points="20,20 40,25 60,40 80,120 120,140 200,180" style="fill:none;stroke:green;stroke-width:2" />
+</svg>
+</div>
+
+<script>
+    function setCursorByID(id, cursorStyle) {
+        var elem;
+        if (
+            document.getElementById &&
+            (elem=document.getElementById(id))
+        ) {
+            if (elem.style) elem.style.cursor = cursorStyle;
+        }
+    }
+    setCursorByID('view', 'crosshair');    const maxX = 900, maxY = 500;
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    var svgNS = svg.namespaceURI;    drawing = [];
+    count = 0;
+    var selected = false;
+    var sx1, sy1, sx2, sy2;
+
+    function click(event) {
+        myProps = document.getElementById('viewport').getBoundingClientRect();
+        if (selected) {
+            selected = false;
+            sx2 = (event.clientX - myProps.left).toFixed();
+            sy2 = (event.clientY - myProps.top).toFixed();
+            drawing[count].setAttributeNS(null, 'x2', sx2);
+            drawing[count].setAttributeNS(null, 'y2', sy2);
+            count++
+        } else {
+            selected = true;
+            sx1 = (event.clientX - myProps.left).toFixed();
+            sy1 = (event.clientY - myProps.top).toFixed();
+            drawing[count] = document.createElementNS(svgNS, 'line');
+            drawing[count].setAttributeNS(null, "stroke", "black");
+            drawing[count].setAttributeNS(null, "stroke-width", 2);
+            drawing[count].setAttributeNS(null, 'x1', sx1);
+            drawing[count].setAttributeNS(null, 'y1', sy1);
+            drawing[count].setAttributeNS(null, 'x2', sx1);
+            drawing[count].setAttributeNS(null, 'y2', sy1);
+            document.getElementById('view').appendChild(drawing[count]);
+        }
+        //document.getElementById('coords').append(' sx1=' + sx1 + ', sy1=' + sy1 + ', sx2=' + sx2 + ', sy2=' + sy2)
+    }
+
+    function getCoords(event) {
+        myProps = document.getElementById('viewport').getBoundingClientRect();
+        var x = (event.clientX - myProps.left).toFixed();
+        var y = (event.clientY - myProps.top).toFixed();
+        document.getElementById('coords').innerHTML = 'x=' + x + ', y=' + y;
+        //document.getElementById('coords').append(' sx1=' + sx1 + ', sy1=' + sy1 + ', sx2=' + sx2 + ', sy2=' + sy2);
+        if (selected) {
+            if (drawing[count]) {
+                drawing[count].setAttributeNS(null, 'x2', (event.clientX - myProps.left).toFixed());
+                drawing[count].setAttributeNS(null, 'y2', (event.clientY - myProps.top).toFixed())
+            }
+        }
+    }
+
+</script>
+</body>
+</html>
