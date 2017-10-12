@@ -4,15 +4,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Draw</title>
     <style type="text/css">
-        #viewport {
-            display: inline-block;
-            width: 900px;
-            height: 500px;
-            margin: 0;
-            padding: 0;
-            box-sizing:border-box;
-            -moz-box-sizing:border-box;
-            -webkit-box-sizing:border-box;
+        #coords {
+            white-space: nowrap;
+            display:inline-block;
+            padding-left: 5px;
         }
         #view {
             pointer-events: all;
@@ -26,13 +21,15 @@
 </head>
 <body>
 
-<div id="coords"></div>
-
-<div id="viewport">
-<svg id="view" height="500" width="900" onmousemove="getCoords(event)" onclick="click(event)"></svg>
+<div>
+    <input type="text" id="color" value="black"><div id="coords"></div>
 </div>
+<svg id="view" height="500" width="900" onmousemove="getCoords(evt)" onclick="click(evt)"></svg>
+
+<div id="object"></div>
 
 <script>
+
     function setCursorByID(id, cursorStyle) {
         var elem;
         if (
@@ -43,16 +40,20 @@
         }
     }
     setCursorByID('view', 'crosshair');
+
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     var svgNS = svg.namespaceURI;
     drawing = [];
     count = 0;
     var selected = false;
 
-    function click(event) {
+    function click(evt) {
+        drawing.forEach(function (t) { console.log(t) });
         myProps = document.getElementById('view').getBoundingClientRect();
-        var x = (event.clientX - myProps.left).toFixed();
-        var y = (event.clientY - myProps.top).toFixed();
+        var x = (evt.clientX - myProps.left).toFixed();
+        var y = (evt.clientY - myProps.top).toFixed();
+        color = document.getElementById('color').value;
+        if (color === '') color = '#000000';
         document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
         if (selected) {
             selected = false;
@@ -62,7 +63,7 @@
         } else {
             selected = true;
             drawing[count] = document.createElementNS(svgNS, 'line');
-            drawing[count].setAttributeNS(null, "stroke", "black");
+            drawing[count].setAttributeNS(null, "stroke", color);
             drawing[count].setAttributeNS(null, "stroke-width", 2);
             drawing[count].setAttributeNS(null, 'x1', x);
             drawing[count].setAttributeNS(null, 'y1', y);
@@ -72,10 +73,10 @@
         }
     }
 
-    function getCoords(event) {
+    function getCoords(evt) {
         myProps = document.getElementById('view').getBoundingClientRect();
-        var x = (event.clientX - myProps.left).toFixed();
-        var y = (event.clientY - myProps.top).toFixed();
+        var x = (evt.clientX - myProps.left).toFixed();
+        var y = (evt.clientY - myProps.top).toFixed();
         document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
         if (selected) {
             if (drawing[count]) {
