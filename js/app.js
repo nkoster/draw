@@ -16,36 +16,24 @@ drawing = [];
 count = 0;
 var selected = false, del = false, debug = false;
 
-function mouseOver(id) {
-    drawing[id].setAttributeNS(null, 'tempStroke', drawing[id].getAttributeNS(null, 'stroke'));
-    if (!selected) {
-        if (!del) {
-            drawing[id].setAttributeNS(null, 'stroke', '#ddeeff')
-        } else {
-            del = false;
-            drawing.slice(id)
-        }
-    }
+function mouseOver(evt) {
+    var element = evt.target;
+    element.setAttributeNS(null, 'tempStroke', element.getAttributeNS(null, 'stroke'));
+    if (!selected) element.setAttributeNS(null, 'stroke', '#ddeeff')
 }
 
-function mouseOut(id) {
-    drawing[id].setAttributeNS(null, 'stroke', drawing[id].getAttributeNS(null, 'tempStroke'))
+function mouseOut(evt) {
+    var element = evt.target;
+    element.setAttributeNS(null, 'stroke', element.getAttributeNS(null, 'tempStroke'))
 }
 
-function mouseDown(evt, id) {
+function mouseDown(evt) {
     if (!selected)
         if (confirm('Delete object?')) {
             var element = evt.target;
             var parent = element.parentNode;
             parent.removeChild(element);
-            for (var i = 0; i < count - 1; i++) {
-                //if (drawing[i].setAttributeNS === 'function') {
-                    drawing[i].setAttributeNS(null, 'onmouseover', 'mouseOver(' + i + ')');
-                    drawing[i].setAttributeNS(null, 'onmouseout', 'mouseOut(' + i + ')');
-                    drawing[i].setAttributeNS(null, 'onmousedown', 'mouseDown(evt, ' + i + ')')
-                //}
-            }
-            count--
+            count--;
         }
 }
 
@@ -77,9 +65,9 @@ function click(evt) {
         drawing[count].setAttributeNS(null, 'y1', y);
         drawing[count].setAttributeNS(null, 'x2', x);
         drawing[count].setAttributeNS(null, 'y2', y);
-        drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(' + count + ')');
-        drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(' + count + ')');
-        drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt, ' + count + ')');
+        drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(evt)');
+        drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(evt)');
+        drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt)');
         document.getElementById('view').appendChild(drawing[count]);
     }
 }
