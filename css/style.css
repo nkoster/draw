@@ -14,4 +14,8 @@
     border: 1px solid #909090;
 }
 
+#debug {
+    font-size: 75%;
+}
+
 line { transition: stroke .4s ease; }
