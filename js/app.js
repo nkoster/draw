@@ -14,15 +14,39 @@ var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var svgNS = svg.namespaceURI;
 drawing = [];
 count = 0;
-var selected = false, debug = false;
+var selected = false, del = false, debug = false;
 
 function mouseOver(id) {
     drawing[id].setAttributeNS(null, 'tempStroke', drawing[id].getAttributeNS(null, 'stroke'));
-    if (!selected) drawing[id].setAttributeNS(null, 'stroke', 'white')
+    if (!selected) {
+        if (!del) {
+            drawing[id].setAttributeNS(null, 'stroke', '#ddeeff')
+        } else {
+            del = false;
+            drawing.slice(id)
+        }
+    }
 }
 
 function mouseOut(id) {
     drawing[id].setAttributeNS(null, 'stroke', drawing[id].getAttributeNS(null, 'tempStroke'))
+}
+
+function mouseDown(evt, id) {
+    if (!selected)
+        if (confirm('Delete object?')) {
+            var element = evt.target;
+            var parent = element.parentNode;
+            parent.removeChild(element);
+            for (var i = 0; i < count - 1; i++) {
+                //if (drawing[i].setAttributeNS === 'function') {
+                    drawing[i].setAttributeNS(null, 'onmouseover', 'mouseOver(' + i + ')');
+                    drawing[i].setAttributeNS(null, 'onmouseout', 'mouseOut(' + i + ')');
+                    drawing[i].setAttributeNS(null, 'onmousedown', 'mouseDown(evt, ' + i + ')')
+                //}
+            }
+            count--
+        }
 }
 
 function click(evt) {
@@ -55,6 +79,7 @@ function click(evt) {
         drawing[count].setAttributeNS(null, 'y2', y);
         drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(' + count + ')');
         drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(' + count + ')');
+        drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt, ' + count + ')');
         document.getElementById('view').appendChild(drawing[count]);
     }
 }
