@@ -14,7 +14,7 @@ var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var svgNS = svg.namespaceURI;
 drawing = [];
 count = 0;
-var selected = false, del = false, debug = false;
+var selected = false, del = false, debug = true;
 
 function mouseOver(evt) {
     var element = evt.target;
@@ -27,6 +27,13 @@ function mouseOut(evt) {
     element.setAttributeNS(null, 'stroke', element.getAttributeNS(null, 'tempStroke'))
 }
 
+function debug_update() {
+    var s = document.getElementById("view");
+    var serializer = new XMLSerializer();
+    var source = serializer.serializeToString(s);
+    document.getElementById('debug').innerText = source
+}
+
 function mouseDown(evt) {
     if (!selected)
         if (confirm('Delete object?')) {
@@ -34,17 +41,12 @@ function mouseDown(evt) {
             var parent = element.parentNode;
             parent.removeChild(element);
             count--;
+            if (debug) debug_update();
         }
 }
 
 function click(evt) {
-    if (debug) {
-        var s = document.getElementById("view");
-        var serializer = new XMLSerializer();
-        var source = serializer.serializeToString(s);
-        document.getElementById('object').innerText = source
-    }
-
+    if (debug) debug_update();
     myProps = document.getElementById('view').getBoundingClientRect();
     var x = (evt.clientX - myProps.left).toFixed();
     var y = (evt.clientY - myProps.top).toFixed();
