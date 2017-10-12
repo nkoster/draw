@@ -10,12 +10,19 @@ var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var svgNS = svg.namespaceURI;
 drawing = [];
 count = 0;
-var selected = false, del = false, debug = true;
+var selected = false, del = false, debug = true, escapePress = false;
 
 function mouseOver(evt) {
     var element = evt.target;
     element.setAttributeNS(null, 'tempStroke', element.getAttributeNS(null, 'stroke'));
-    if (!selected) element.setAttributeNS(null, 'stroke', '#ddeeff')
+    if (!selected) element.setAttributeNS(null, 'stroke', '#ddeeff');
+    if (selected && escapePress) {
+        escapePress = false;
+        selected = false;
+        var parent = element.parentNode;
+        parent.removeChild(element);
+        if (debug) debug_update();
+    }
 }
 
 function mouseOut(evt) {
@@ -82,3 +89,10 @@ function getCoords(evt) {
         }
     }
 }
+
+document.onkeydown = function(evt) {
+    evt = evt || window.event;
+    if (evt.keyCode == 27) {
+        escapePress = true
+    }
+};
