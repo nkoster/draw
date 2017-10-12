@@ -3,21 +3,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Draw</title>
-    <style type="text/css">
-        #coords {
-            white-space: nowrap;
-            display:inline-block;
-            padding-left: 5px;
-        }
-        #view {
-            pointer-events: all;
-            background: #00bbdd;
-            width: 900px;
-            height: 500px;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script src="js/app.js"></script>
 </head>
 <body>
 
@@ -28,64 +15,8 @@
 
 <div id="object"></div>
 
-<script>
+<script src="js/app.js"></script>
 
-    function setCursorByID(id, cursorStyle) {
-        var elem;
-        if (
-            document.getElementById &&
-            (elem=document.getElementById(id))
-        ) {
-            if (elem.style) elem.style.cursor = cursorStyle;
-        }
-    }
-    setCursorByID('view', 'crosshair');
-
-    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    var svgNS = svg.namespaceURI;
-    drawing = [];
-    count = 0;
-    var selected = false;
-
-    function click(evt) {
-        drawing.forEach(function (t) { console.log(t) });
-        myProps = document.getElementById('view').getBoundingClientRect();
-        var x = (evt.clientX - myProps.left).toFixed();
-        var y = (evt.clientY - myProps.top).toFixed();
-        color = document.getElementById('color').value;
-        if (color === '') color = '#000000';
-        document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
-        if (selected) {
-            selected = false;
-            drawing[count].setAttributeNS(null, 'x2', x);
-            drawing[count].setAttributeNS(null, 'y2', y);
-            count++
-        } else {
-            selected = true;
-            drawing[count] = document.createElementNS(svgNS, 'line');
-            drawing[count].setAttributeNS(null, "stroke", color);
-            drawing[count].setAttributeNS(null, "stroke-width", 2);
-            drawing[count].setAttributeNS(null, 'x1', x);
-            drawing[count].setAttributeNS(null, 'y1', y);
-            drawing[count].setAttributeNS(null, 'x2', x);
-            drawing[count].setAttributeNS(null, 'y2', y);
-            document.getElementById('view').appendChild(drawing[count]);
-        }
-    }
-
-    function getCoords(evt) {
-        myProps = document.getElementById('view').getBoundingClientRect();
-        var x = (evt.clientX - myProps.left).toFixed();
-        var y = (evt.clientY - myProps.top).toFixed();
-        document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
-        if (selected) {
-            if (drawing[count]) {
-                drawing[count].setAttributeNS(null, 'x2', x);
-                drawing[count].setAttributeNS(null, 'y2', y)
-            }
-        }
-    }
-
-</script>
 </body>
 </html>
+
