@@ -1,0 +1,17 @@
+#coords {
+    white-space: nowrap;
+    display:inline-block;
+    padding-left: 5px;
+}
+
+#view {
+    pointer-events: all;
+    background: #d0d0d0;
+    width: 900px;
+    height: 500px;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #909090;
+}
+
+line { transition: stroke .4s ease; }
