@@ -10,7 +10,7 @@ var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var svgNS = svg.namespaceURI;
 drawing = [];
 count = 0;
-var selected = false, del = false, debug = true, escapePress = false;
+var selected = false, del = false, debug = true, escapePress = false, deletePress = false;
 
 function mouseOver(evt) {
     var element = evt.target;
@@ -39,12 +39,15 @@ function debug_update() {
 
 function mouseDown(evt) {
     if (!selected)
-        if (confirm('Delete object?')) {
-            var element = evt.target;
-            var parent = element.parentNode;
-            parent.removeChild(element);
-            count--;
-            if (debug) debug_update();
+        if (deletePress) {
+        deletePress = false;
+            if (confirm('Delete object?')) {
+                var element = evt.target;
+                var parent = element.parentNode;
+                parent.removeChild(element);
+                count--;
+                if (debug) debug_update();
+            }
         }
 }
 
@@ -92,7 +95,6 @@ function getCoords(evt) {
 
 document.onkeydown = function(evt) {
     evt = evt || window.event;
-    if (evt.keyCode == 27) {
-        escapePress = true
-    }
+    if (evt.keyCode == 27) escapePress = true;
+    if (evt.keyCode == 46) deletePress = true
 };
