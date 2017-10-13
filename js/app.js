@@ -67,7 +67,7 @@ function click(evt) {
         count++
     } else {
         selected = true;
-        escapePress = false;
+        deletePress = false;
         setCursorByID('view', 'crosshair');
         drawing[count] = document.createElementNS(svgNS, 'line');
         drawing[count].setAttributeNS(null, "stroke", color);
