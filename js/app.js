@@ -41,7 +41,8 @@ function mouseDown(evt) {
     if (!selected)
         if (deletePress) {
         deletePress = false;
-            if (confirm('Delete object?')) {
+        setCursorByID('view', 'crosshair');
+        if (confirm('Delete object?')) {
                 var element = evt.target;
                 var parent = element.parentNode;
                 parent.removeChild(element);
@@ -66,6 +67,8 @@ function click(evt) {
         count++
     } else {
         selected = true;
+        escapePress = false;
+        setCursorByID('view', 'crosshair');
         drawing[count] = document.createElementNS(svgNS, 'line');
         drawing[count].setAttributeNS(null, "stroke", color);
         drawing[count].setAttributeNS(null, "stroke-width", 3);
@@ -95,6 +98,9 @@ function getCoords(evt) {
 
 document.onkeydown = function(evt) {
     evt = evt || window.event;
-    if (evt.keyCode == 27) escapePress = true;
-    if (evt.keyCode == 46) deletePress = true
+    if (evt.keyCode === 27) escapePress = true;
+    if (evt.keyCode === 46 || evt.keyCode === 68) {
+        setCursorByID('view', 'default');
+        deletePress = true
+    }
 };
