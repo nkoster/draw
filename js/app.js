@@ -39,10 +39,11 @@ function dist(a, b){
 
 var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 var svgNS = svg.namespaceURI;
-drawing = [];
-count = 0;
+var drawing = [];
+var count = 0;
+
 var
-    selected = false,
+    selected = 0,
     del = false,
     debug = true,
     escapePress = false,
@@ -52,18 +53,21 @@ var
     drawLine = 0,
     drawArc = 1,
     draw = drawLine;
-var xx, yy;
+
+var xx, yy, xxx, yyy;
 
 function mouseOver(evt) {
     var element = evt.target;
     element.setAttributeNS(null, 'tempStroke', element.getAttributeNS(null, 'stroke'));
-    if (!selected) element.setAttributeNS(null, 'stroke', '#ddeeff');
-    if (selected && escapePress) {
+    if (selected === 0) element.setAttributeNS(null, 'stroke', '#ddeeff');
+    if (selected > 0 && escapePress) {
         escapePress = false;
-        selected = false;
-        var parent = element.parentNode;
-        parent.removeChild(element);
-        if (debug) debug_update();
+        selected--;
+        if (selected === 0) {
+            var parent = element.parentNode;
+            parent.removeChild(element);
+            if (debug) debug_update();
+        }
     }
 }
 
@@ -80,7 +84,7 @@ function debug_update() {
 }
 
 function mouseDown(evt) {
-    if (!selected)
+    if (selected === 0)
         if (deletePress) {
         deletePress = false;
         setCursorByID('view', 'crosshair');
@@ -102,19 +106,29 @@ function click(evt) {
     color = document.getElementById('color').value;
     if (color === '') color = '#000000';
     document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
-    if (selected) {
-        selected = false;
+    if (selected > 0) {
         if (draw === drawLine) {
             drawing[count].setAttributeNS(null, 'x2', x);
             drawing[count].setAttributeNS(null, 'y2', y);
+            selected--;
             count++
         }
         if (draw === drawArc) {
-            drawing[count].setAttributeNS(null, 'd', 'M' + xx + ',' + yy + ' C5,45 45,45 ' + x + ',' + y);
-            count++
+            if (selected === 1) {
+                xxx = x;
+                yyy = y;
+                selected++;
+                drawing[count].setAttributeNS(null, 'd', calcCirclePath(xx, yy, x, y, xx, yy));
+            } else if (selected === 2) {
+                selected = 0;
+                drawing[count].setAttributeNS(null, 'd', calcCirclePath(xxx, yyy, x, y, xx, yy));
+                xxx = 0;
+                yyy = 0;
+                count++
+            }
         }
     } else {
-        selected = true;
+        selected++;
         deletePress = false;
         setCursorByID('view', 'crosshair');
         if (draw === drawLine) {
@@ -131,18 +145,17 @@ function click(evt) {
             document.getElementById('view').appendChild(drawing[count])
         }
         if (draw === drawArc) {
-            xx = x; yy = y;
             drawing[count] = document.createElementNS(svgNS, "path");
             drawing[count].setAttributeNS(null, 'stroke', color);
             drawing[count].setAttributeNS(null, 'stroke-width', 3);
-            //drawing[count].setAttributeNS(null, 'd', 'M' + xx + ',' + yy + ' C5,45 45,45 ' + x + ',' + y);
-            drawing[count].setAttributeNS(null, 'd', calcCirclePath(xx,yy, xx,yy, x,y));
+            drawing[count].setAttributeNS(null, 'd', calcCirclePath(x,y, x,y, x,y));
+            xx = x;
+            yy = y;
             drawing[count].setAttributeNS(null, 'fill', 'none');
             drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(evt)');
             drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(evt)');
             drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt)');
-            document.getElementById('view').appendChild(drawing[count]);
-        }
+            document.getElementById('view').appendChild(drawing[count]);        }
     }
 }
 
@@ -151,7 +164,11 @@ function getCoords(evt) {
     var x = (evt.clientX - myProps.left).toFixed();
     var y = (evt.clientY - myProps.top).toFixed();
     document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
-    if (selected) {
+    // if (escapePress) {
+    //     escapePress = false;
+    //     if (selected > 0) selected--
+    // }
+    if (selected > 0) {
         if (draw === drawLine) {
             if (drawing[count]) {
                 drawing[count].setAttributeNS(null, 'x2', x);
@@ -160,7 +177,11 @@ function getCoords(evt) {
         }
         if (draw === drawArc) {
             if (drawing[count]) {
-                drawing[count].setAttributeNS(null, 'd', calcCirclePath(xx,yy, x,y, 100,100));
+                if (xxx === 0 && yyy === 0) {
+                    drawing[count].setAttributeNS(null, 'd', calcCirclePath(xx, yy, x, y, xx, yy))
+                } else {
+                    drawing[count].setAttributeNS(null, 'd', calcCirclePath(xxx, yyy, x, y, xx, yy))
+                }
             }
         }
     }
