@@ -9,7 +9,12 @@
 <body>
 
 <div>
-    <input type="text" id="color" value="black"><div id="coords"></div>
+    <input type="text" id="color" value="black">
+    <select id="action">
+        <option value="line">line</option>
+        <option value="arc">arc</option>
+    </select>
+    <div id="coords"></div>
 </div>
 <svg id="view" height="500" width="900" onmousemove="getCoords(evt)" onclick="click(evt)"></svg>
 
