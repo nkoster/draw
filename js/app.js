@@ -7,54 +7,49 @@ function setCursorByID(id, cursorStyle) {
 setCursorByID('view', 'crosshair');
 
 function calcCirclePath(x1, y1, x2, y2, x3, y3){
-    var a = [x1, y1];
-    var b = [x3, y3];
-    var c = [x2, y2];
+    var
+        a = [x1, y1],
+        b = [x3, y3],
+        c = [x2, y2],
+        A = dist(b, c),
+        B = dist(c, a),
+        C = dist(a, b),
+        angle = Math.acos((A * A + B * B - C * C) / (2 * A * B)),
+        // Radius of circle
+        K = .5 * A * B * Math.sin(angle),
+        r = A * B * C / 4 / K;
 
-    var A = dist(b, c);
-    var B = dist(c, a);
-    var C = dist(a, b);
+    r = Math.round(r * 1000) / 1000;
 
-    var angle = Math.acos((A*A + B*B - C*C)/(2*A*B));
+    // Large Arc Flag
+    var laf = +(Math.PI / 2 > angle);
 
-    //calc radius of circle
-    var K = .5*A*B*Math.sin(angle);
-    var r = A*B*C/4/K;
-    r = Math.round(r*1000)/1000;
-
-    //large arc flag
-    var laf = +(Math.PI/2 > angle);
-
-    //sweep flag
-    var saf = +((b[0] - a[0])*(c[1] - a[1]) - (b[1] - a[1])*(c[0] - a[0]) < 0);
+    // Sweep Flag
+    var saf = +((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]) < 0);
 
     return ['M', a, 'A', r, r, 0, laf, saf, b].join(' ')
 }
 
 function dist(a, b){
-    return Math.sqrt(
-        Math.pow(a[0] - b[0], 2) +
-        Math.pow(a[1] - b[1], 2))
+    return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2))
 }
 
-var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-var svgNS = svg.namespaceURI;
-var drawing = [];
-var count = 0;
-
 var
+    svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"),
+    svgNS = svg.namespaceURI,
+    drawing = [],
+    count = 0,
     selected = 0,
-    del = false,
     debug = true,
     escapePress = false,
-    deletePress = false;
-
-var
+    deletePress = false,
     drawLine = 0,
     drawArc = 1,
-    draw = drawLine;
+    draw = drawArc,
+    xx, yy, xxx, yyy;
 
-var xx, yy, xxx, yyy;
+var action = document.getElementById('action');
+draw = action.selectedIndex;
 
 function mouseOver(evt) {
     var element = evt.target;
@@ -79,8 +74,7 @@ function mouseOut(evt) {
 function debug_update() {
     var s = document.getElementById("view");
     var serializer = new XMLSerializer();
-    var source = serializer.serializeToString(s);
-    document.getElementById('debug').innerText = source
+    document.getElementById('debug').innerText = serializer.serializeToString(s)
 }
 
 function mouseDown(evt) {
@@ -160,14 +154,11 @@ function click(evt) {
 }
 
 function getCoords(evt) {
+    if (selected === 0) draw = action.selectedIndex;
     myProps = document.getElementById('view').getBoundingClientRect();
     var x = (evt.clientX - myProps.left).toFixed();
     var y = (evt.clientY - myProps.top).toFixed();
     document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
-    // if (escapePress) {
-    //     escapePress = false;
-    //     if (selected > 0) selected--
-    // }
     if (selected > 0) {
         if (draw === drawLine) {
             if (drawing[count]) {
