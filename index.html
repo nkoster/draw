@@ -14,9 +14,16 @@
         <option value="line">line</option>
         <option value="arc">arc</option>
     </select>
+    <input type="text" id="xy" value="0,0" onkeypress="return xyKeyPress(event)">
     <div id="coords"></div>
 </div>
+
+<div id="view-container">
 <svg id="view" height="500" width="900" onmousemove="getCoords(evt)" onclick="click(evt)"></svg>
+<svg id="back" height="500" width="900" onmousemove="getCoords(evt)" onclick="click(evt)">
+    <!-- <line stroke="black" stroke-width="3" x1="75" y1="50" x2="189" y2="69" /> -->
+</svg>
+</div>
 
 <div id="debug"></div>
 
