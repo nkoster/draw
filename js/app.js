@@ -30,7 +30,7 @@ function calcCirclePath(x1, y1, x2, y2, x3, y3){
     return ['M', a, 'A', r, r, 0, laf, saf, b].join(' ')
 }
 
-function dist(a, b){
+function dist(a, b) {
     return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2))
 }
 
@@ -48,38 +48,44 @@ var
     draw = drawArc,
     xx, yy, xxx, yyy;
 
-var action = document.getElementById('action');
-draw = action.selectedIndex;
+var
+    action = document.getElementById('action');
+
+function debug_update(msg) {
+    console.log("DEBUG: " + msg);
+    var s = document.getElementById("view");
+    var serializer = new XMLSerializer();
+    myString = serializer.serializeToString(s);
+    document.getElementById('debug').innerText = myString.toString()
+        // .replace("onmouseover=\"mouseOver(evt)\"", "")
+        // .replace("onmouseout=\"mouseOut(evt)\"", "")
+        // .replace("onmousedown=\"mouseDown(evt)\"", "")
+        // .replace("temp-stroke-opacity=\"null\"", "")
+        // .replace("stroke-opacity=\"null\"", "")
+}
 
 function mouseOver(evt) {
     var element = evt.target;
-    element.setAttributeNS(null, 'tempStroke', element.getAttributeNS(null, 'stroke'));
-    if (selected === 0) element.setAttributeNS(null, 'stroke', '#ddeeff');
+    element.setAttributeNS(null, 'temp-stroke-opacity', element.getAttributeNS(null, 'stroke-opacity'));
+    if (selected === 0) element.setAttributeNS(null, 'stroke-opacity', 0.2);
     if (selected > 0 && escapePress) {
         escapePress = false;
         selected--;
         if (selected === 0) {
             var parent = element.parentNode;
             parent.removeChild(element);
-            if (debug) debug_update();
+            if (debug) debug_update("mouseover");
         }
     }
 }
 
 function mouseOut(evt) {
     var element = evt.target;
-    element.setAttributeNS(null, 'stroke', element.getAttributeNS(null, 'tempStroke'))
-}
-
-function debug_update() {
-    var s = document.getElementById("view");
-    var serializer = new XMLSerializer();
-    document.getElementById('debug').innerText = serializer.serializeToString(s)
+    element.setAttributeNS(null, 'stroke-opacity', element.getAttributeNS(null, 'temp-stroke-opacity'))
 }
 
 function mouseDown(evt) {
-    if (selected === 0)
-        if (deletePress) {
+    if (deletePress) {
         deletePress = false;
         setCursorByID('view', 'crosshair');
         if (confirm('Delete object?')) {
@@ -87,13 +93,47 @@ function mouseDown(evt) {
                 var parent = element.parentNode;
                 parent.removeChild(element);
                 count--;
-                if (debug) debug_update();
+                if (debug) debug_update("mousedown");
+        }
+        selected = 0;
+    }
+}
+
+function xyKeyPress(evt) {
+    if (evt.keyCode == 13) {
+        var s = document.getElementById('xy').value;
+        var arr = s.split(",");
+        color = document.getElementById('color').value;
+        if (color === '') color = '#000000';
+        if (draw === drawLine) {
+            if (selected === 0) {
+                console.log(`${arr[0]} ${arr[1]} ${count}`);
+                debug_update('NEW');
+                drawing[count] = document.createElementNS(svgNS, 'line');
+                drawing[count].setAttributeNS(null, 'stroke', color);
+                drawing[count].setAttributeNS(null, 'stroke-width', 3);
+                drawing[count].setAttributeNS(null, 'x1', arr[0]);
+                drawing[count].setAttributeNS(null, 'y1', arr[1]);
+                drawing[count].setAttributeNS(null, 'x2', 0);
+                drawing[count].setAttributeNS(null, 'y2', 0);
+                drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(evt)');
+                drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(evt)');
+                drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt)');
+                document.getElementById('view').appendChild(drawing[count]);
+                selected = 1
+            } else if (selected === 1) {
+                drawing[count].setAttributeNS(null, 'x2', arr[0]);
+                drawing[count].setAttributeNS(null, 'y2', arr[1]);
+                count++;
+                selected = 0
             }
         }
+        //return false
+    }
 }
 
 function click(evt) {
-    if (debug) debug_update();
+    if (debug) debug_update("click");
     myProps = document.getElementById('view').getBoundingClientRect();
     var x = (evt.clientX - myProps.left).toFixed();
     var y = (evt.clientY - myProps.top).toFixed();
@@ -102,8 +142,6 @@ function click(evt) {
     document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
     if (selected > 0) {
         if (draw === drawLine) {
-            drawing[count].setAttributeNS(null, 'x2', x);
-            drawing[count].setAttributeNS(null, 'y2', y);
             selected--;
             count++
         }
@@ -112,10 +150,8 @@ function click(evt) {
                 xxx = x;
                 yyy = y;
                 selected++;
-                drawing[count].setAttributeNS(null, 'd', calcCirclePath(xx, yy, x, y, xx, yy));
             } else if (selected === 2) {
                 selected = 0;
-                drawing[count].setAttributeNS(null, 'd', calcCirclePath(xxx, yyy, x, y, xx, yy));
                 xxx = 0;
                 yyy = 0;
                 count++
@@ -142,7 +178,7 @@ function click(evt) {
             drawing[count] = document.createElementNS(svgNS, "path");
             drawing[count].setAttributeNS(null, 'stroke', color);
             drawing[count].setAttributeNS(null, 'stroke-width', 3);
-            drawing[count].setAttributeNS(null, 'd', calcCirclePath(x,y, x,y, x,y));
+            //drawing[count].setAttributeNS(null, 'd', calcCirclePath(x,y, x,y, x,y));
             xx = x;
             yy = y;
             drawing[count].setAttributeNS(null, 'fill', 'none');
@@ -168,10 +204,10 @@ function getCoords(evt) {
         }
         if (draw === drawArc) {
             if (drawing[count]) {
-                if (xxx === 0 && yyy === 0) {
-                    drawing[count].setAttributeNS(null, 'd', calcCirclePath(xx, yy, x, y, xx, yy))
-                } else {
-                    drawing[count].setAttributeNS(null, 'd', calcCirclePath(xxx, yyy, x, y, xx, yy))
+                if (xxx !== 0 && yyy !== 0) {
+                    var d = calcCirclePath(xxx, yyy, x, y, xx, yy);
+                    if (d.indexOf('NaN') === -1)
+                        drawing[count].setAttributeNS(null, 'd', d)
                 }
             }
         }
