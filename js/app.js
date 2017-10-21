@@ -56,12 +56,14 @@ function debug_update(msg) {
     var s = document.getElementById("view");
     var serializer = new XMLSerializer();
     myString = serializer.serializeToString(s);
-    document.getElementById('debug').innerText = myString.toString()
-        // .replace("onmouseover=\"mouseOver(evt)\"", "")
-        // .replace("onmouseout=\"mouseOut(evt)\"", "")
-        // .replace("onmousedown=\"mouseDown(evt)\"", "")
-        // .replace("temp-stroke-opacity=\"null\"", "")
-        // .replace("stroke-opacity=\"null\"", "")
+    document.getElementById('debug').innerText = myString
+        .replace(/onmousemove="getCoords\(evt\)"/g, "")
+        .replace(/onclick="click\(evt\)"/g, "")
+        .replace(/onmouseover="mouseOver\(evt\)"/g, "")
+        .replace(/onmouseout="mouseOut\(evt\)"/g, "")
+        .replace(/onmousedown="mouseDown\(evt\)"/g, "")
+        .replace(/temp-stroke-opacity="null"/g, "")
+        .replace(/stroke-opacity="null"/g, "")
 }
 
 function mouseOver(evt) {
@@ -108,7 +110,6 @@ function xyKeyPress(evt) {
         if (draw === drawLine) {
             if (selected === 0) {
                 console.log(`${arr[0]} ${arr[1]} ${count}`);
-                debug_update('NEW');
                 drawing[count] = document.createElementNS(svgNS, 'line');
                 drawing[count].setAttributeNS(null, 'stroke', color);
                 drawing[count].setAttributeNS(null, 'stroke-width', 3);
@@ -128,6 +129,7 @@ function xyKeyPress(evt) {
                 selected = 0
             }
         }
+        if (debug) debug_update('KEYPRESS')
         //return false
     }
 }
