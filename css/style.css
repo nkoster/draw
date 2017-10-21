@@ -4,18 +4,40 @@
     padding-left: 5px;
 }
 
-#view {
-    pointer-events: all;
-    background: #d0d0d0;
+#view-container {
+    position: relative;
     width: 900px;
     height: 500px;
+}
+
+#view {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 900px;
+    height: 500px;
+    z-index: 20;
+    pointer-events: all;
+    background: none;
     margin: 0;
     padding: 0;
     border: 1px solid #909090;
+}
+
+#back {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 900px;
+    height: 500px;
+    z-index: 10;
+    background: #e0e0e0;
+    margin: 0;
+    padding: 0;
 }
 
 #debug {
     font-size: 75%;
 }
 
-line { transition: stroke .4s ease; }
+line,path { transition: stroke-opacity .4s ease; }
