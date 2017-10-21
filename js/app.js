@@ -64,6 +64,7 @@ function debug_update(msg) {
         .replace(/onmousedown="mouseDown\(evt\)"/g, "")
         .replace(/temp-stroke-opacity="null"/g, "")
         .replace(/stroke-opacity="null"/g, "")
+        .replace(/>/g, ">\n")
 }
 
 function mouseOver(evt) {
