@@ -110,7 +110,7 @@ function xyKeyPress(evt) {
         if (color === '') color = '#000000';
         if (draw === drawLine) {
             if (selected === 0) {
-                console.log(`${arr[0]} ${arr[1]} ${count}`);
+                //console.log(`${arr[0]} ${arr[1]} ${count}`);
                 drawing[count] = document.createElementNS(svgNS, 'line');
                 drawing[count].setAttributeNS(null, 'stroke', color);
                 drawing[count].setAttributeNS(null, 'stroke-width', 3);
@@ -129,6 +129,34 @@ function xyKeyPress(evt) {
                 count++;
                 selected = 0
             }
+        } else if (draw === drawArc) {
+            if (selected === 0) {
+                drawing[count] = document.createElementNS(svgNS, "path");
+                drawing[count].setAttributeNS(null, 'stroke', color);
+                drawing[count].setAttributeNS(null, 'stroke-width', 3);
+                xx = arr[0];
+                yy = arr[1];
+                drawing[count].setAttributeNS(null, 'fill', 'none');
+                drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(evt)');
+                drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(evt)');
+                drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt)');
+                document.getElementById('view').appendChild(drawing[count]);
+                selected = 1;
+                document.getElementById('point').innerText = '2nd';
+            } else if (selected === 1) {
+                xxx = arr[0];
+                yyy = arr[1];
+                selected = 2;
+                document.getElementById('point').innerText = '3rd';
+            } else if (selected === 2) {
+                var d = calcCirclePath(xxx, yyy, arr[0], arr[1], xx, yy);
+                if (d.indexOf('NaN') === -1)
+                    drawing[count].setAttributeNS(null, 'd', d)
+                selected = 0;
+                xxx = 0;
+                yyy = 0;
+                count++
+            }
         }
         if (debug) debug_update('KEYPRESS')
         //return false
@@ -140,6 +168,7 @@ function click(evt) {
     myProps = document.getElementById('view').getBoundingClientRect();
     var x = (evt.clientX - myProps.left).toFixed();
     var y = (evt.clientY - myProps.top).toFixed();
+    document.getElementById("xy").value = x + ',' + y;
     color = document.getElementById('color').value;
     if (color === '') color = '#000000';
     document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
@@ -188,7 +217,8 @@ function click(evt) {
             drawing[count].setAttributeNS(null, 'onmouseover', 'mouseOver(evt)');
             drawing[count].setAttributeNS(null, 'onmouseout', 'mouseOut(evt)');
             drawing[count].setAttributeNS(null, 'onmousedown', 'mouseDown(evt)');
-            document.getElementById('view').appendChild(drawing[count]);        }
+            document.getElementById('view').appendChild(drawing[count]);
+        }
     }
 }
 
@@ -199,6 +229,11 @@ function getCoords(evt) {
     var y = (evt.clientY - myProps.top).toFixed();
     document.getElementById('coords').innerHTML = 'objects=' + count + ', x=' + x + ', y=' + y;
     if (selected > 0) {
+        if (selected === 1) {
+            document.getElementById('point').innerText = '2nd';
+        } else if (selected === 2) {
+            document.getElementById('point').innerText = '3rd';
+        }
         if (draw === drawLine) {
             if (drawing[count]) {
                 drawing[count].setAttributeNS(null, 'x2', x);
@@ -214,6 +249,8 @@ function getCoords(evt) {
                 }
             }
         }
+    } else {
+        document.getElementById('point').innerText = '1st';
     }
 }
 
