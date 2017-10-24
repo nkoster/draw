@@ -48,6 +48,8 @@ var
     draw = drawArc,
     xx, yy, xxx, yyy;
 
+console.log(svgNS);
+
 var
     action = document.getElementById('action');
 
@@ -158,13 +160,12 @@ function xyKeyPress(evt) {
                 count++
             }
         }
-        if (debug) debug_update('KEYPRESS')
         //return false
     }
+    if (debug) debug_update('KEYPRESS')
 }
 
 function click(evt) {
-    if (debug) debug_update("click");
     myProps = document.getElementById('view').getBoundingClientRect();
     var x = (evt.clientX - myProps.left).toFixed();
     var y = (evt.clientY - myProps.top).toFixed();
@@ -210,7 +211,6 @@ function click(evt) {
             drawing[count] = document.createElementNS(svgNS, "path");
             drawing[count].setAttributeNS(null, 'stroke', color);
             drawing[count].setAttributeNS(null, 'stroke-width', 3);
-            //drawing[count].setAttributeNS(null, 'd', calcCirclePath(x,y, x,y, x,y));
             xx = x;
             yy = y;
             drawing[count].setAttributeNS(null, 'fill', 'none');
@@ -220,6 +220,7 @@ function click(evt) {
             document.getElementById('view').appendChild(drawing[count]);
         }
     }
+    if (debug) debug_update("click")
 }
 
 function getCoords(evt) {
